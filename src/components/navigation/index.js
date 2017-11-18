@@ -33,21 +33,47 @@ class Navigation extends React.Component {
             id="navbarSupportedContent"
           >
             <ul className="navbar-nav">
-              <li className={ props.location.pathname === "/backend/game" ? "nav-item active" : "nav-item" }>
+              <li
+                className={
+                  props.location.pathname === "/backend/game"
+                    ? "nav-item active"
+                    : "nav-item"
+                }
+              >
                 <Link to={"/backend/game"} className="nav-link">
                   {props.labels.gameLinkTitle[props.language]}
                 </Link>
               </li>
-              <li className={ props.location.pathname === "/backend/categories" ? "nav-item active" : "nav-item" }>
-                <Link to={"/backend/categories"} className="nav-link">
-                  {props.labels.categoriesLinkTitle[props.language]}
-                </Link>
-              </li>
-              <li className={ props.location.pathname === "/backend/words" ? "nav-item active" : "nav-item" }>
-                <Link to={"/backend/words"} className="nav-link">
-                  {props.labels.wordsLinkTitle[props.language]}
-                </Link>
-              </li>
+              {props.loggedIn ? (
+                <li
+                  className={
+                    props.location.pathname === "/backend/categories"
+                      ? "nav-item active"
+                      : "nav-item"
+                  }
+                >
+                  <Link to={"/backend/categories"} className="nav-link">
+                    {props.labels.categoriesLinkTitle[props.language]}
+                  </Link>
+                </li>
+              ) : (
+                ""
+              )}
+              {props.loggedIn ? (
+                <li
+                  className={
+                    props.location.pathname === "/backend/words"
+                      ? "nav-item active"
+                      : "nav-item"
+                  }
+                >
+                  <Link to={"/backend/words"} className="nav-link">
+                    {props.labels.wordsLinkTitle[props.language]}
+                  </Link>
+                </li>
+              ) : (
+                ""
+              )}
               <li
                 className={
                   props.location.pathname === "/backend/login"
@@ -61,11 +87,11 @@ class Navigation extends React.Component {
                     className="nav-link"
                     onClick={this.handleLogout}
                   >
-                    {props.labels.loginLinkTitle[props.language]} ({props.user.username})
+                    {props.labels.logoutLinkTitle[props.language]} ({props.user.username})
                   </a>
                 ) : (
                   <Link to={"/backend/login"} className="nav-link">
-                    {props.labels.logoutLinkTitle[props.language]}
+                    {props.labels.loginLinkTitle[props.language]}
                   </Link>
                 )}
               </li>
