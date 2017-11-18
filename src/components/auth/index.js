@@ -31,7 +31,7 @@ class Auth extends React.Component {
         <div className="row justify-content-center">
           <div className="col-sm-4">
             <h3>{ props.labels.login.loginPageTitle[LANG] }</h3>
-            <form onSubmit={this.handleSubmit}>
+            <form onSubmit={this.handleSubmit} style={{ marginBottom: '10px' }}>
               <div className="form-group">
                 <label htmlFor="usernameInput">
                   {props.labels.login.usernameLabel[LANG]}
@@ -76,6 +76,12 @@ class Auth extends React.Component {
                 {props.labels.login.submitBtnLabel[LANG]}
               </button>
             </form>
+            { Object.keys(props.error).length ?
+              <div className="alert alert-danger">{ props.error.text }</div>
+              : '' }
+            { !props.loginForm.valid ?
+              <div className="alert alert-danger">Поля формы должны быть заполнены!</div>
+              : '' }
           </div>
         </div>
       </div>
