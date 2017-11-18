@@ -7,6 +7,7 @@ import Navigation from '../navigation';
 import Game from '../game';
 import Auth from '../auth';
 import Categories from '../categories';
+import Words from '../words';
 
 class App extends React.Component {
   componentDidMount () {
@@ -14,20 +15,21 @@ class App extends React.Component {
   }
 
   render () {
-    let props = this.props;
+    let props = this.props;    
     return (
       <div>
         { !props.appLoaded ? 
           <div className="alert alert-warning">Загружаем приложение...</div> : 
           <div>
-            { !this.props.loggedIn && this.props.location.pathname !== '/backend/login' ?
+            { (!props.loggedIn && (props.location.pathname === '/backend/categories' || props.location.pathname === '/backend/words')) ?
               <Redirect to='/backend/login' /> : '' }
-            { !props.fetchingState ?
+            { !props.fetching ?
               <div>
                 <Navigation location={ this.props.location } />
                 <Switch>
                   <Route exact path='/backend/login' component={ Auth }/>
                   <Route exact path='/backend/categories' component={ Categories }/>
+                  <Route exact path='/backend/words' component={ Words }/>
                   <Route path='/' component={ Game }/>
                 </Switch>
               </div> : <div className="alert alert-warning">Загружаем данные приложения...</div> }
@@ -40,7 +42,7 @@ class App extends React.Component {
 
 const mapStateToProps = state => ({
   appLoaded: state.app.appLoaded,
-  fething: state.app.fething,
+  fetching: state.app.fetching,
   loggedIn: state.app.loggedIn
 });
 

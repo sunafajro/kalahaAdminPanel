@@ -27,20 +27,20 @@ class Auth extends React.Component {
     const props = this.props;
     return (
       <div>
-        {props.loggedIn ? <Redirect to="/backend/game" push /> : ""}
+        {props.loggedIn ? <Redirect to="/backend" push /> : ""}
         <div className="row justify-content-center">
           <div className="col-sm-4">
-            <h3>{ props.labels.login.loginPageTitle[LANG] }</h3>
+            <h3>{ props.labels.loginPageTitle[props.language] }</h3>
             <form onSubmit={this.handleSubmit} style={{ marginBottom: '10px' }}>
               <div className="form-group">
                 <label htmlFor="usernameInput">
-                  {props.labels.login.usernameLabel[LANG]}
+                  {props.labels.usernameLabel[props.language]}
                 </label>
                 <input
                   type="text"
                   className="form-control"
                   id="usernameInput"
-                  placeholder={props.labels.login.usernamePlaceholder[LANG]}
+                  placeholder={props.labels.usernamePlaceholder[props.language]}
                   value={props.loginForm.username}
                   onChange={e => {
                     let loginForm = { ...props.loginForm };
@@ -52,13 +52,13 @@ class Auth extends React.Component {
               </div>
               <div className="form-group">
                 <label htmlFor="passwordInput">
-                  {props.labels.login.passwordLabel[LANG]}
+                  {props.labels.passwordLabel[props.language]}
                 </label>
                 <input
                   type="password"
                   className="form-control"
                   id="passwordInput"
-                  placeholder={props.labels.login.passwordPlaceholder[LANG]}
+                  placeholder={props.labels.passwordPlaceholder[props.language]}
                   value={props.loginForm.password}
                   onChange={e => {
                     let loginForm = { ...props.loginForm };
@@ -73,7 +73,7 @@ class Auth extends React.Component {
                 className="btn btn-primary"
                 disabled={props.fetching}
               >
-                {props.labels.login.submitBtnLabel[LANG]}
+                {props.labels.submitBtnLabel[props.language]}
               </button>
             </form>
             { Object.keys(props.error).length ?
@@ -94,7 +94,8 @@ const mapStateToProps = state => ({
   loggedIn: state.app.loggedIn,
   fetching: state.auth.fetching,
   error: state.auth.error,
-  labels: state.app.labels
+  language: state.app.language,
+  labels: state.app.labels.login
 });
 
 const mapDispatchToProps = dispatch =>
