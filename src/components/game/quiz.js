@@ -220,7 +220,7 @@ class Quiz extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  words: state.words.words,
+  words: state.categories.words,
   quiz: state.quiz,
   activeCategory: state.categories.activeCategory
 });

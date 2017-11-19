@@ -1,8 +1,7 @@
 import React from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { getCategories, updateActiveCategory } from "../../modules/actions/categories";
-import { getCategoryWords } from "../../modules/actions/words";
+import { getCategories, updateActiveCategory, getCategoryWords } from "../../modules/actions/categories";
 import Quiz from './quiz';
 import Audio from './audio';
 
@@ -79,11 +78,12 @@ class Game extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  fetchingCategories: state.categories.fetching,
-  fetchingWords: state.words.fetching,
+  fetchingCategories: state.categories.fetchingCategories,
+  fetchingWords: state.categories.fetchingWords,
   active: state.categories.activeCategory,
   categories: state.categories.categories,
-  words: state.words.words,
+  words: state.categories.words,
+  labels: state.app.labels,
   language: state.app.language,
   error: state.categories.error
 });
