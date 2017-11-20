@@ -1,17 +1,20 @@
 import React from "react";
+import { object } from "prop-types";
 
 const baseUrl = "/sites/default/files/flashcards";
 
-class Card extends React.Component {
-  render() {
-    const props = this.props;
+Card.propTypes = {
+  word: object.isRequired
+};
+
+function Card({ word }) {
     let urlThmbImg;
     let urlFullImg;
-    if (props.word.image) {
-      if (props.word.categories && props.word.categories.kalaha1) {
+    if (word.image) {
+      if (word.categories && word.categories.kalaha1) {
         urlThmbImg = baseUrl + "/kalaha1/thmb/";
         urlFullImg = baseUrl + "/kalaha1/full/";
-      } else if (props.word.categories && props.word.categories.kalaha2) {
+      } else if (word.categories && word.categories.kalaha2) {
         urlThmbImg = baseUrl + "/kalaha2/thmb/";
         urlFullImg = baseUrl + "/kalaha2/full/";
       }
@@ -21,19 +24,18 @@ class Card extends React.Component {
         {urlThmbImg ? (
           <img
             className="card-img-top"
-            src={urlThmbImg + props.word.image + ".jpg"}
-            alt={props.word.cv}
+            src={urlThmbImg + word.image + ".jpg"}
+            alt={word.cv}
           />
         ) : (
           ""
         )}
         <div className="card-body">
-          <h5 className="card-title">{props.word.cv}</h5>
-          <p>{props.word.ru}</p>
+          <h5 className="card-title">{word.cv}</h5>
+          <p>{word.ru}</p>
         </div>
       </div>
     );
-  }
 }
 
 export default Card;

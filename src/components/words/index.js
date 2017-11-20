@@ -1,32 +1,55 @@
 import React from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { getAllWords } from "../../modules/actions/words";
+import { bool, func, object, string } from "prop-types";
+
+import { getCategoryWords } from "../../modules/actions/words";
 import Card from "./card";
 
 class Words extends React.Component {
-  componentDidMount() {
-    this.props.getAllWords();
+  state= {
+    html: []
   }
-  render() {
-    const props = this.props;
-    const num = Object.keys(props.words).length;
-    let Html = [];
+
+  static propTypes = {
+    fetching: bool.isRequired,
+    words: object.isRequired,
+    error: object.isRequired,
+    language: string.isRequired,
+    labels: object.isRequired,
+    getCategoryWords: func.isRequired,
+  };
+
+  /* вызываем действие для получения терминов из категории "Все" */
+  componentDidMount() {
+    this.props.getCategoryWords('all');
+  }
+  
+  /* получаем объект с терминами, обрабатываем и кладем в стейт */
+  componentWillReceiveProps (nextProps) {
+    const num = Object.keys(nextProps.words).length;
+    let html = [];
     if (num) {
       let row = 1;
-      let items = Object.keys(props.words);
+      let items = Object.keys(nextProps.words);
       while (items.length > 0) {
         let columns = items.splice(0, 5);
-        Html.push(
+        html.push(
           <div key={"row-" + row} className="card-deck" style={{ marginBottom: '10px' }}>
             {columns.map(el => {
-              return <Card key={"card-" + el} word={props.words[el]} />;
+              return <Card key={"card-" + el} word={nextProps.words[el]} />;
             })}
           </div>
         );
         row++;
       }
     }
+    this.setState({ html });
+  }
+
+  render() {
+    const state = this.state;
+    const props = this.props;
     return (
       <div>
         {props.fetching ? (
@@ -37,7 +60,7 @@ class Words extends React.Component {
           <div className="row">
             <div className="col-sm-3" />
             <div className="col-sm-9">
-              {Object.keys(props.words).length ? Html : ""}
+              {state.html ? state.html : ""}
             </div>
           </div>
         )}
@@ -47,8 +70,8 @@ class Words extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  fetching: state.categories.fetching,
-  words: state.words.words,
+  fetching: state.words.fetching,
+  words: state.words.data,
   language: state.app.language,
   labels: state.app.labels,
   error: state.categories.error
@@ -57,7 +80,7 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      getAllWords
+      getCategoryWords
     },
     dispatch
   );
