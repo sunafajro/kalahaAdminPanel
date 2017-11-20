@@ -4,19 +4,11 @@ import {
   LOGIN_FAILED,
   LOGOUT,
   LOGOUT_SUCCESS,
-  LOGOUT_FAILED,
-  UPDATE_LOGIN_FORM
+  LOGOUT_FAILED
 } from "../constants";
-
-const DEFAULT_LOGIN_FORM = {
-    username: "",
-    password: "",
-    valid: true
-  };
 
 const initialState = {
   fetching: false,
-  loginForm: { ...DEFAULT_LOGIN_FORM },
   error: {}
 };
 
@@ -29,12 +21,9 @@ export default (state = initialState, action) => {
       };
 
     case LOGIN_SUCCESS:
-      let loginForm = { ...state.loginForm };
-      loginForm.password = "";
       return {
         ...state,
         fetching: false,
-        loginForm,
         error: {}
       };
 
@@ -42,7 +31,6 @@ export default (state = initialState, action) => {
       return {
         ...state,
         fetching: false,
-        loginForm:  { ...DEFAULT_LOGIN_FORM },
         error: action.message
       };
 
@@ -56,7 +44,6 @@ export default (state = initialState, action) => {
       return {
         ...state,
         fetching: false,
-        loginForm:  { ...DEFAULT_LOGIN_FORM },
         error: {}
       };
 
@@ -65,13 +52,6 @@ export default (state = initialState, action) => {
         ...state,
         fetching: false,
         error: action.message
-      };
-
-    case UPDATE_LOGIN_FORM:
-      return {
-        ...state,
-        loginForm: action.loginForm,
-        error: {}
       };
 
     default:

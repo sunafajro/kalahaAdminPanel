@@ -5,12 +5,11 @@ import {
   LOGIN_FAILED,
   LOGOUT,
   LOGOUT_SUCCESS,
-  LOGOUT_FAILED,
-  UPDATE_LOGIN_FORM
+  LOGOUT_FAILED
 } from "../constants";
 import { updateAppState } from './app';
 
-export const login = (username, password) => {
+export const login = ({username, password}) => {
   return dispatch => {
     dispatch({
       type: LOGIN
@@ -18,7 +17,7 @@ export const login = (username, password) => {
 
     const body = {
       LoginForm: {
-        username: username,
+        username,
         password: md5(password)
       }
     };
@@ -100,15 +99,6 @@ export const logoutFailed = error => {
     dispatch({
       type: LOGOUT_FAILED,
       message: { type: "fail", text: error }
-    });
-  };
-};
-
-export const updateLoginForm = (loginForm) => {
-  return dispatch => {
-    dispatch({
-      type: UPDATE_LOGIN_FORM,
-      loginForm
     });
   };
 };
