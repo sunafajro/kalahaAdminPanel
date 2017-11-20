@@ -9,11 +9,8 @@ import {
 } from "../constants";
 
 const initialState = {
-  fetchingCategories: false,
-  fetchingWords: false,
-  activeCategory: {},
-  categories: {},
-  words: {},
+  fetching: false,
+  data: {},
   error: {}
 };
 
@@ -22,57 +19,23 @@ export default (state = initialState, action) => {
     case GET_CATEGORIES:
       return {
         ...state,
-        fetchingCategories: true
+        fetching: true
       };
 
     case GET_CATEGORIES_SUCCESS:
       return {
         ...state,
-        fetchingCategories: false,
-        activeCategory: action.activeCategory,
-        categories: action.categories,
+        fetching: false,
+        data: action.categories,
         error: {}
       };
 
     case GET_CATEGORIES_FAILED:
       return {
         ...state,
-        fetchingCategories: false,
-        activeCategory: {},
-        categories: {},
+        fetching: false,
+        data: {},
         error: action.error
-      };
-
-      case GET_CATEGORY_WORDS:
-      return {
-        ...state,
-        fetchingWords: true
-      };
-
-    case GET_CATEGORY_WORDS_SUCCESS:
-      return {
-        ...state,
-        fetchingCategories: false,
-        fetchingWords: false,
-        words: action.words,
-        error: {}
-      };
-
-    case GET_CATEGORY_WORDS_FAILED:
-      return {
-        ...state,
-        fetchingCategories: false,
-        fetchingWords: false,
-        words: {},
-        error: action.error
-      };
-
-    case UPDATE_ACTIVE_CATEGORY:
-      let activeCategory = { ...state.categories[action.category] }
-      activeCategory.name = action.category;
-      return {
-        ...state,
-        activeCategory
       };
 
     default:
