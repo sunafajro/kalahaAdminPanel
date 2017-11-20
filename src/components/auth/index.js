@@ -2,72 +2,77 @@ import React from "react";
 import { Link, Redirect } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { login, updateLoginForm } from "../../modules/actions/auth";
+import { bool, func, object, string } from "prop-types";
 
-const LANG = 'ru';
+import { login } from "../../modules/actions/auth";
+import Input from "./input";
 
 class Auth extends React.Component {
+  state = {
+    username: "",
+    password: "",
+    valid: true
+  };
+
+  static propTypes = {
+    loggedIn: bool.isRequired,
+    fetching: bool.isRequired,
+    error: object.isRequired,
+    language: string.isRequired,
+    labels: object.isRequired
+  };
+
+  /**
+   * @param { Object } e 
+   */
   handleSubmit = e => {
     e.preventDefault();
-    
-    let loginForm = { ...this.props.loginForm };
-    const username = this.props.loginForm.username;
-    const password = this.props.loginForm.password;
+    let valid = true;
+    const username = this.state.username;
+    const password = this.state.password;
 
     if (!username || !password) {
-      loginForm.valid = false;
-      this.props.updateLoginForm(loginForm);
+      valid = false;
+      this.setState({ valid });
     } else {
-      loginForm.valid = true;
-      this.props.updateLoginForm(loginForm);
-      this.props.login(username, password);
+      this.props.login({ username, password });
     }
   };
+
+  /**
+   * @param { string } key
+   * @param { string } value
+   */
+  onChange = (key, value) => {
+    this.setState({ [key]: value });
+  };
+
   render() {
+    const state = this.state;
     const props = this.props;
     return (
       <div>
         {props.loggedIn ? <Redirect to="/backend" push /> : ""}
         <div className="row justify-content-center">
           <div className="col-sm-4">
-            <h3>{ props.labels.loginPageTitle[props.language] }</h3>
-            <form onSubmit={this.handleSubmit} style={{ marginBottom: '10px' }}>
-              <div className="form-group">
-                <label htmlFor="usernameInput">
-                  {props.labels.usernameLabel[props.language]}
-                </label>
-                <input
-                  type="text"
-                  className="form-control"
-                  id="usernameInput"
-                  placeholder={props.labels.usernamePlaceholder[props.language]}
-                  value={props.loginForm.username}
-                  onChange={e => {
-                    let loginForm = { ...props.loginForm };
-                    loginForm.username = e.target.value;
-                    this.props.updateLoginForm(loginForm)
-                  }}
-                  disabled={props.fetching}
-                />
-              </div>
-              <div className="form-group">
-                <label htmlFor="passwordInput">
-                  {props.labels.passwordLabel[props.language]}
-                </label>
-                <input
-                  type="password"
-                  className="form-control"
-                  id="passwordInput"
-                  placeholder={props.labels.passwordPlaceholder[props.language]}
-                  value={props.loginForm.password}
-                  onChange={e => {
-                    let loginForm = { ...props.loginForm };
-                    loginForm.password = e.target.value;
-                    this.props.updateLoginForm(loginForm)
-                  }}
-                  disabled={props.fetching}
-                />
-              </div>
+            <h3>{props.labels.loginPageTitle[props.language]}</h3>
+            <form onSubmit={this.handleSubmit} style={{ marginBottom: "10px" }}>
+              <Input
+                label={props.labels.usernameLabel[props.language]}
+                name="username"
+                value={state.username}
+                placeholder={props.labels.usernamePlaceholder[props.language]}
+                disabled={props.fetching}
+                onChange={this.onChange}
+              />
+              <Input
+                label={props.labels.passwordLabel[props.language]}
+                name="password"
+                value={state.password}
+                placeholder={props.labels.passwordPlaceholder[props.language]}
+                disabled={props.fetching}
+                onChange={this.onChange}
+              />
               <button
                 type="submit"
                 className="btn btn-primary"
@@ -76,12 +81,18 @@ class Auth extends React.Component {
                 {props.labels.submitBtnLabel[props.language]}
               </button>
             </form>
-            { Object.keys(props.error).length ?
-              <div className="alert alert-danger">{ props.error.text }</div>
-              : '' }
-            { !props.loginForm.valid ?
-              <div className="alert alert-danger">Поля формы должны быть заполнены!</div>
-              : '' }
+            {Object.keys(props.error).length ? (
+              <div className="alert alert-danger">{props.error.text}</div>
+            ) : (
+              ""
+            )}
+            {!state.valid ? (
+              <div className="alert alert-danger">
+                Поля формы должны быть заполнены!
+              </div>
+            ) : (
+              ""
+            )}
           </div>
         </div>
       </div>
@@ -90,7 +101,6 @@ class Auth extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  loginForm: state.auth.loginForm,
   loggedIn: state.app.loggedIn,
   fetching: state.auth.fetching,
   error: state.auth.error,
@@ -101,7 +111,6 @@ const mapStateToProps = state => ({
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
-      updateLoginForm,
       login
     },
     dispatch
