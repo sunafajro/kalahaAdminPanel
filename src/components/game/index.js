@@ -1,25 +1,58 @@
 import React from "react";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { getCategories, updateActiveCategory, getCategoryWords } from "../../modules/actions/categories";
-import Quiz from './quiz';
-import Audio from './audio';
+import { bool, func, object, string } from "prop-types";
+
+import { getCategories } from "../../modules/actions/categories";
+import { getCategoryWords } from "../../modules/actions/words";
+import Quiz from "./quiz";
+import Audio from "./audio";
 
 class Game extends React.Component {
+  state = {
+    activeCategory: {}
+  }
+
+  static propTypes = {
+    fetchingCategories: bool.isRequired,
+    categories: object.isRequired,
+    fetchingWords: bool.isRequired,
+    words: object.isRequired,
+    error: object.isRequired,
+    language: string.isRequired,
+    labels: object.isRequired,
+    getCategories: func.isRequired,
+    getCategoryWords: func.isRequired,
+  };
+  
+  /* вызываем действие для получения категорий */
   componentDidMount() {
     this.props.getCategories();
   }
+  
+  /* 
+   * если категория в стейте пустая, а из редакса пришел объект с категориями.
+   * берем первую категорию из него, сохраняем в стейт как активную 
+   * и вызываем запрос терминов для этой категории
+   */
+  componentWillReceiveProps (nextProps) {
+    if (!Object.keys(this.state.activeCategory).length && Object.keys(nextProps.categories).length) {
+      const categoryName = Object.keys(nextProps.categories)[0];
+      let activeCategory = nextProps.categories[categoryName];
+      activeCategory.name = categoryName;
+      this.props.getCategoryWords(categoryName);
+      this.setState({ activeCategory });
+    }
+  }
 
   render() {
-    let props = this.props;
+    const state = this.state;
+    const props = this.props;
     return (
       <div>
         {props.fetchingCategories ? (
-          <div className="alert alert-warning">Загружаем данные...</div>
+          <div className="alert alert-warning">Загружаем категории...</div>
         ) : (
-          ""
-        )}
-        {!props.fetchingCategories ? (
           <div className="row">
             <div className="col-sm-3">
               {Object.keys(props.error).length ? (
@@ -35,14 +68,14 @@ class Game extends React.Component {
                       <a
                         key={"category-" + item}
                         className={
-                          props.active.name === item
+                          state.activeCategory.name === item
                             ? "list-group-item active"
                             : "list-group-item"
                         }
                         href="#"
                         onClick={e => {
                           e.preventDefault();
-                          props.updateActiveCategory(item);
+                          this.setState({ activeCategory: props.categories[item] });
                           props.getCategoryWords(item);
                         }}
                       >
@@ -63,14 +96,12 @@ class Game extends React.Component {
               ) : (
                 <div className="row align-items-center" style={{minHeight: '200px'}}>
                   { Object.keys(props.words).length ?
-                    <Quiz /> : ""}
+                    <Quiz activeCategory={state.activeCategory} /> : ""}
                 </div>
               )}
               <Audio />
             </div>
           </div>
-        ) : (
-          ""
         )}
       </div>
     );
@@ -78,11 +109,10 @@ class Game extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  fetchingCategories: state.categories.fetchingCategories,
-  fetchingWords: state.categories.fetchingWords,
-  active: state.categories.activeCategory,
-  categories: state.categories.categories,
-  words: state.categories.words,
+  fetchingCategories: state.categories.fetching,
+  fetchingWords: state.words.fetching,
+  categories: state.categories.data,
+  words: state.words.data,
   labels: state.app.labels,
   language: state.app.language,
   error: state.categories.error
@@ -92,8 +122,7 @@ const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
       getCategories,
-      getCategoryWords,
-      updateActiveCategory
+      getCategoryWords
     },
     dispatch
   );
