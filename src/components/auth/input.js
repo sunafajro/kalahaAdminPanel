@@ -15,7 +15,7 @@ function Input({ label, name, value, placeholder, disabled, onChange }) {
     <div className="form-group">
       <label htmlFor={name + "Input"}>{label}</label>
       <input
-        type="text"
+        type={ name === "password" ? "password" : "text" }
         className="form-control"
         id={name + "Input"}
         placeholder={placeholder}
