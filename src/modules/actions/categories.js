@@ -37,7 +37,7 @@ export const getCategoriesSuccess = (categories) => {
   return dispatch => {
     dispatch({
       type: GET_CATEGORIES_SUCCESS,
-      categories
+      categories: categories.length === undefined ? categories : {} 
     });
   };
 };

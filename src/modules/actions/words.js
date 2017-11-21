@@ -38,7 +38,7 @@ export const getCategoryWordsSuccess = (words) => {
   return dispatch => {
     dispatch({
       type: GET_CATEGORY_WORDS_SUCCESS,
-      words
+      words: words.length === undefined ? words : {} 
     });
   };
 };
