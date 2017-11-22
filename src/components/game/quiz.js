@@ -1,28 +1,41 @@
 import React from "react";
-import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
+import { object } from 'prop-types';
+
 import {
   CLASSLIST,
-  CLASSLIST_DEFAULT,
   CLASSLIST_CORRECT,
   CLASSLIST_INCORRECT
-} from "../../modules/reducers/quiz";
-import { updateQuizState } from "../../modules/actions/quiz";
+} from "./constants";
+import ResponseOne from './responseOne';
+import ResponseTwo from './responseTwo';
+import ResponseThree from './responseThree';
+import ResponseFour from './responseFour';
 
 class Quiz extends React.Component {
+  state = {
+    start: false,
+    active: false,
+    totalCount: 0,
+    correctId: null,
+    word: null,
+    responses: {},
+    classList: { ...CLASSLIST }
+  }
+
+  static propTypes = {
+    activeCategory: object.isRequired,
+    words: object.isRequired
+  };
+
   componentWillReceiveProps (nextProps) {
     if (this.props.activeCategory !== nextProps.activeCategory) {
-      let quiz = { ...this.props.quiz };
-      quiz.start = false;
-      quiz.active = false;
-      this.props.updateQuizState(quiz);
+      this.setState({ start: false, active: false });
     }
   }
+
   componentWillUnmount () {
-    let quiz = { ...this.props.quiz };
-    quiz.start = false;
-    quiz.active = false;
-    this.props.updateQuizState(quiz);
+    this.setState({ start: false, active: false });
   }
 
   /* генерируем случайное число <= min и > max */
@@ -30,23 +43,31 @@ class Quiz extends React.Component {
     return Math.floor(Math.random() * (max - min)) + min;
   };
 
+  /* подготавливаем игру к очередному раунду */
   prepareQuizData = () => {
-    let quiz = { ...this.props.quiz };
-    quiz.words = this.props.words;
-    const num = this.getRandomInt(1, Object.keys(quiz.words).length + 1);
-    const word = quiz.words[num];
-    const { correctId, responses } = this.prepareResponses(word, quiz.words);
-    quiz.correctId = correctId;
-    quiz.word = word;
-    quiz.responses = responses;
-    quiz.classList = CLASSLIST;
-    quiz.active = true;
-    if (!quiz.start) {
-      quiz.start = true;
+    const words = { ...this.props.words };
+    const num = this.getRandomInt(1, Object.keys(words).length + 1);
+    const word = words[num];
+    /* вызываем функцию подготовки вариантов ответа */
+    const { correctId, responses } = this.prepareResponses(word, words);
+    this.setState({
+      word,
+      correctId: correctId,
+      responses: responses,
+      classList: CLASSLIST,
+      active: true
+    });
+    if (!this.state.start) {
+      this.setState({ start: true });
     }
-    this.props.updateQuizState(quiz);
   };
 
+  /**
+   * готовим объект варианта ответа
+   * @param { Object } responses
+   * @param { Object } words
+   * @returns { Object }
+   */
   createResponse = (responses, words) => {
     let response;
     let i = 1;
@@ -71,6 +92,12 @@ class Quiz extends React.Component {
     return response;
   };
 
+  /**
+   * выбираем случайные ответы из общего списка слов
+   * @param { Object } word
+   * @param { Object } words
+   * @returns { Object }
+   */
   prepareResponses = (word, words) => {
     let responses = {};
     const correctId = this.getRandomInt(1, 5);
@@ -90,15 +117,17 @@ class Quiz extends React.Component {
     return { correctId, responses };
   };
 
+  /** 
+   * @param { Object } e
+  */
   checkAnswer = e => {
-    if (this.props.quiz.active) {
-      let quiz = { ...this.props.quiz };
+    if (this.state.active) {
       const correctAnswer = document.querySelector("#teres");
       const incorrectAnswer = document.querySelector("#teres_mar");
       const num = e.target.id.substr(-1, 1);
-      let totalCount = quiz.totalCount;
-      let classList = { ...quiz.classList };
-      if (quiz.responses[num].cv === quiz.word.cv) {
+      let totalCount = this.state.totalCount;
+      let classList = { ...this.state.classList };
+      if (this.state.responses[num].cv === this.state.word.cv) {
         totalCount++;
         classList[num] = CLASSLIST_CORRECT;
         correctAnswer.play();
@@ -107,85 +136,42 @@ class Quiz extends React.Component {
           totalCount--;
         }
         classList[num] = CLASSLIST_INCORRECT;
-        classList[quiz.correctId] = CLASSLIST_CORRECT;
+        classList[this.state.correctId] = CLASSLIST_CORRECT;
         incorrectAnswer.play();
       }
-      quiz.totalCount = totalCount;
-      quiz.classList = classList;
-      quiz.active = false;
-      this.props.updateQuizState(quiz);
+      this.setState({
+        totalCount,
+        classList,
+        active: false
+      });
     }
   };
 
   render() {
-    const props = this.props;
+    const { classList, responses, start, totalCount, word } = this.state;
     return (
       <div className="col-sm-12 text-center">
-        {props.quiz.start ? (
+        { start ? (
           <div>
             <div className="row">
               <div className="col-sm-12 text-center">
-                <h3>Общий счет: {props.quiz.totalCount}</h3>
+                <h3>Общий счет: { totalCount }</h3>
               </div>
             </div>
             <div className="row">
               <div className="col-sm-8 offset-sm-2 jumbotron text-center">
-                <h1 style={{ marginBottom: 0 }}>{props.quiz.word.cv}</h1>
+                <h1 style={{ marginBottom: 0 }}>{ word.cv}</h1>
               </div>
             </div>
-            {Object.keys(props.quiz.responses).length ? (
+            {Object.keys(responses).length ? (
               <div className="row">
                 <div className="col-sm-4 offset-sm-2 text-center">
-                  <div
-                    id="panel-1"
-                    style={{ cursor: "pointer", marginBottom: "10px" }}
-                    className={props.quiz.classList[1]}
-                    onClick={this.checkAnswer}
-                  >
-                    <div id="panelHeader1" className="card-body">
-                      <h3 id="response-1" className="card-title" style={{ marginBottom: 0 }}>
-                        {props.quiz.responses[1].ru}
-                      </h3>
-                    </div>
-                  </div>
-                  <div
-                    id="panel-3"
-                    style={{ cursor: "pointer" }}
-                    className={props.quiz.classList[3]}
-                    onClick={this.checkAnswer}
-                  >
-                    <div id="panelHeader3" className="card-body">
-                      <h3 id="response-3" className="card-title" style={{ marginBottom: 0 }}>
-                        {props.quiz.responses[3].ru}
-                      </h3>
-                    </div>
-                  </div>
+                  <ResponseOne elementClass={ classList[1] } response={responses[1].ru} check={ this.checkAnswer } />
+                  <ResponseThree elementClass={ classList[3] } response={responses[3].ru} check={ this.checkAnswer } />
                 </div>
                 <div className="col-sm-4 text-center">
-                  <div
-                    id="panel-2"
-                    style={{ cursor: "pointer", marginBottom: "10px" }}
-                    className={props.quiz.classList[2]}
-                    onClick={this.checkAnswer}
-                  >
-                    <div id="panelHeader2" className="card-body">
-                      <h3 id="response-2" className="card-title" style={{ marginBottom: 0 }}>
-                        {props.quiz.responses[2].ru}
-                      </h3>
-                    </div>
-                  </div>
-                  <div
-                    id="panel-4"
-                    style={{ cursor: "pointer" }}
-                    className={props.quiz.classList[4]}
-                    onClick={this.checkAnswer}
-                  >
-                    <div id="panelHeader4" className="card-body">
-                      <h3 id="response-4" className="card-title" style={{ marginBottom: 0 }}>
-                        {props.quiz.responses[4].ru}
-                      </h3>
-                    </div>
-                  </div>
+                  <ResponseTwo elementClass={ classList[2] } response={responses[2].ru} check={ this.checkAnswer } />
+                  <ResponseFour elementClass={ classList[4] } response={responses[4].ru} check={ this.checkAnswer } />
                 </div>
               </div>
             ) : (
@@ -195,7 +181,7 @@ class Quiz extends React.Component {
               <div className="col-sm-12 text-center">
                 <button
                   className="btn btn-lg btn-success"
-                  onClick={this.prepareQuizData}
+                  onClick={ this.prepareQuizData }
                 >
                   <span
                     className="glyphicon glyphicon-repeat"
@@ -220,17 +206,7 @@ class Quiz extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  words: state.categories.words,
-  quiz: state.quiz,
-  activeCategory: state.categories.activeCategory
+  words: state.words.data
 });
 
-const mapDispatchToProps = dispatch =>
-  bindActionCreators(
-    {
-      updateQuizState
-    },
-    dispatch
-  );
-
-export default connect(mapStateToProps, mapDispatchToProps)(Quiz);
+export default connect(mapStateToProps, null)(Quiz);
