@@ -7,10 +7,7 @@ import {
   CLASSLIST_CORRECT,
   CLASSLIST_INCORRECT
 } from "./constants";
-import ResponseOne from './responseOne';
-import ResponseTwo from './responseTwo';
-import ResponseThree from './responseThree';
-import ResponseFour from './responseFour';
+import Response from './response';
 
 class Quiz extends React.Component {
   state = {
@@ -46,50 +43,23 @@ class Quiz extends React.Component {
   /* подготавливаем игру к очередному раунду */
   prepareQuizData = () => {
     const words = { ...this.props.words };
-    const num = this.getRandomInt(1, Object.keys(words).length + 1);
-    const word = words[num];
-    /* вызываем функцию подготовки вариантов ответа */
-    const { correctId, responses } = this.prepareResponses(word, words);
-    this.setState({
-      word,
-      correctId: correctId,
-      responses: responses,
-      classList: CLASSLIST,
-      active: true
-    });
-    if (!this.state.start) {
-      this.setState({ start: true });
-    }
-  };
-
-  /**
-   * готовим объект варианта ответа
-   * @param { Object } responses
-   * @param { Object } words
-   * @returns { Object }
-   */
-  createResponse = (responses, words) => {
-    let response;
-    let i = 1;
-    while (!response) {
-      /* защищаемся от бесконечного цикла */
-      if (i > 100) {
-        break;
-      }
-      let check = true;
+    /* так как ответов четыре, проверяем что исходный объект содежит такое количество */
+    if (Object.keys(words).length >= 4) {
       const num = this.getRandomInt(1, Object.keys(words).length + 1);
-      const word = words[num];
-      Object.keys(responses).forEach(el => {
-        if (word.cv === responses[el].cv) {
-          check = false;
-        }
+      const word = words[Object.keys(words)[num-1]];
+      /* вызываем функцию подготовки вариантов ответа */
+      const { correctId, responses } = this.prepareResponses(word, words);
+      this.setState({
+        word,
+        correctId: correctId,
+        responses: responses,
+        classList: CLASSLIST,
+        active: true
       });
-      if (check) {
-        response = words[num];
-      }
-      i++;
+      if (!this.state.start) {
+        this.setState({ start: true });
+      }     
     }
-    return response;
   };
 
   /**
@@ -115,6 +85,36 @@ class Quiz extends React.Component {
       i++;
     }
     return { correctId, responses };
+  };
+
+  /**
+   * готовим объект варианта ответа
+   * @param { Object } responses
+   * @param { Object } words
+   * @returns { Object }
+   */
+  createResponse = (responses, words) => {
+    let response;
+    let i = 1;
+    while (!response) {
+      /* защищаемся от бесконечного цикла */
+      if (i > 100) {
+        break;
+      }
+      let check = true;
+      const num = this.getRandomInt(1, Object.keys(words).length + 1);
+      const word = words[Object.keys(words)[num-1]];
+      Object.keys(responses).forEach(el => {
+        if (word.cv === responses[el].cv) {
+          check = false;
+        }
+      });
+      if (check) {
+        response = words[Object.keys(words)[num-1]];
+      }
+      i++;
+    }
+    return response;
   };
 
   /** 
@@ -166,12 +166,12 @@ class Quiz extends React.Component {
             {Object.keys(responses).length ? (
               <div className="row">
                 <div className="col-sm-4 offset-sm-2 text-center">
-                  <ResponseOne elementClass={ classList[1] } response={responses[1].ru} check={ this.checkAnswer } />
-                  <ResponseThree elementClass={ classList[3] } response={responses[3].ru} check={ this.checkAnswer } />
+                  <Response id={ '1' } elementClass={ classList[1] } response={responses[1].ru} check={ this.checkAnswer } />
+                  <Response id={ '3' } elementClass={ classList[3] } response={responses[3].ru} check={ this.checkAnswer } />
                 </div>
                 <div className="col-sm-4 text-center">
-                  <ResponseTwo elementClass={ classList[2] } response={responses[2].ru} check={ this.checkAnswer } />
-                  <ResponseFour elementClass={ classList[4] } response={responses[4].ru} check={ this.checkAnswer } />
+                  <Response id={ '2' } elementClass={ classList[2] } response={responses[2].ru} check={ this.checkAnswer } />
+                  <Response id={ '4' } elementClass={ classList[4] } response={responses[4].ru} check={ this.checkAnswer } />
                 </div>
               </div>
             ) : (

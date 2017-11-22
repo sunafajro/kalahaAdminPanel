@@ -65,22 +65,24 @@ class Game extends React.Component {
                 <div className="list-group">
                   {Object.keys(props.categories).map(item => {
                     return (
-                      <a
+                      <span
                         key={"category-" + item}
+                        style={{ cursor: 'pointer' }}
                         className={
                           state.activeCategory.name === item
                             ? "list-group-item active"
                             : "list-group-item"
                         }
-                        href="#"
                         onClick={e => {
                           e.preventDefault();
-                          this.setState({ activeCategory: props.categories[item] });
+                          let activeCategory = props.categories[item];
+                          activeCategory.name = item;
+                          this.setState({ activeCategory });
                           props.getCategoryWords(item);
                         }}
                       >
                         {props.categories[item].title[props.language]}
-                      </a>
+                      </span>
                     );
                   })}
                 </div>
