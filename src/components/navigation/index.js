@@ -58,6 +58,12 @@ class Navigation extends React.Component {
               ) : (
                 ""
               )}
+              <LanguageSwitcher
+                inactiveLanguage={inactiveLanguage}
+                language={language}
+                Translations={Translations}
+                changeAppLanguage={changeAppLanguage}
+              />
               <LoginLogout
                 language={language}
                 loggedIn={loggedIn}
@@ -65,11 +71,6 @@ class Navigation extends React.Component {
                 Translations={Translations}
                 user={user}
                 logout={logout}
-              />
-              <LanguageSwitcher
-                inactiveLanguage={inactiveLanguage}
-                language={language}
-                changeAppLanguage={changeAppLanguage}
               />
             </ul>
           </div>

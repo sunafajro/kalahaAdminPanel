@@ -22,5 +22,9 @@ export const Translations = {
   menuTitle: {
     cv: "Менӳ",
     ru: "Меню"
-  }
+  },
+   languageName: {
+    cv: "Чӑвашла",
+    ru: "Русский"
+   }
 };
