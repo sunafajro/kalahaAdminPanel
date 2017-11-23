@@ -1,7 +1,7 @@
 import React from "react";
 import { object } from "prop-types";
 
-const baseUrl = "/sites/default/files/flashcards";
+const baseUrl = "/files/images/flashcards";
 
 Card.propTypes = {
   word: object.isRequired

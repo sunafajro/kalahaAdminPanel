@@ -5,6 +5,7 @@ import { bool, func, object, string } from "prop-types";
 
 import { getCategoryWords } from "../../modules/actions/words";
 import Card from "./card";
+import { Translations } from "../../translations/words";
 
 class Words extends React.Component {
   state= {
@@ -16,7 +17,6 @@ class Words extends React.Component {
     words: object.isRequired,
     error: object.isRequired,
     language: string.isRequired,
-    labels: object.isRequired,
     getCategoryWords: func.isRequired,
   };
 
@@ -48,19 +48,19 @@ class Words extends React.Component {
   }
 
   render() {
-    const state = this.state;
-    const props = this.props;
+    const { html } = this.state;
+    const { fetching, language } = this.props;
     return (
       <div>
-        {props.fetching ? (
+        { fetching ? (
           <div className="alert alert-warning">
-            Загружаем данные приложения...
+            { Translations.appDataLoadingProccess[language] }
           </div>
         ) : (
           <div className="row">
             <div className="col-sm-3" />
             <div className="col-sm-9">
-              {state.html ? state.html : ""}
+              { html ? html : ""}
             </div>
           </div>
         )}
@@ -73,7 +73,6 @@ const mapStateToProps = state => ({
   fetching: state.words.fetching,
   words: state.words.data,
   language: state.app.language,
-  labels: state.app.labels,
   error: state.categories.error
 });
 

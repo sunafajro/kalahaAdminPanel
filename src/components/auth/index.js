@@ -1,11 +1,12 @@
 import React from "react";
-import { Link, Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { bool, func, object, string } from "prop-types";
+import { bool, object, string } from "prop-types";
 
 import { login } from "../../modules/actions/auth";
 import Input from "./input";
+import { Translations } from "../../translations/auth";
 
 class Auth extends React.Component {
   state = {
@@ -18,12 +19,11 @@ class Auth extends React.Component {
     loggedIn: bool.isRequired,
     fetching: bool.isRequired,
     error: object.isRequired,
-    language: string.isRequired,
-    labels: object.isRequired
+    language: string.isRequired
   };
 
   /**
-   * @param { Object } e 
+   * @param { Object } e
    */
   handleSubmit = e => {
     e.preventDefault();
@@ -48,47 +48,47 @@ class Auth extends React.Component {
   };
 
   render() {
-    const state = this.state;
-    const props = this.props;
+    const { password, username, valid } = this.state;
+    const { error, fetching, language, loggedIn } = this.props;
     return (
       <div>
-        {props.loggedIn ? <Redirect to="/backend" push /> : ""}
+        {loggedIn ? <Redirect to="/" push /> : ""}
         <div className="row justify-content-center">
           <div className="col-sm-4">
-            <h3>{props.labels.loginPageTitle[props.language]}</h3>
+            <h3>{Translations.loginPageTitle[language]}</h3>
             <form onSubmit={this.handleSubmit} style={{ marginBottom: "10px" }}>
               <Input
-                label={props.labels.usernameLabel[props.language]}
+                label={Translations.usernameLabel[language]}
                 name="username"
-                value={state.username}
-                placeholder={props.labels.usernamePlaceholder[props.language]}
-                disabled={props.fetching}
+                value={username}
+                placeholder={Translations.usernamePlaceholder[language]}
+                disabled={fetching}
                 onChange={this.onChange}
               />
               <Input
-                label={props.labels.passwordLabel[props.language]}
+                label={Translations.passwordLabel[language]}
                 name="password"
-                value={state.password}
-                placeholder={props.labels.passwordPlaceholder[props.language]}
-                disabled={props.fetching}
+                value={password}
+                placeholder={Translations.passwordPlaceholder[language]}
+                disabled={fetching}
                 onChange={this.onChange}
               />
               <button
                 type="submit"
                 className="btn btn-primary"
-                disabled={props.fetching}
+                disabled={fetching}
               >
-                {props.labels.submitBtnLabel[props.language]}
+                {Translations.submitBtnLabel[language]}
               </button>
             </form>
-            {Object.keys(props.error).length ? (
-              <div className="alert alert-danger">{props.error.text}</div>
+            {Object.keys(error).length ? (
+              <div className="alert alert-danger">{error.text}</div>
             ) : (
               ""
             )}
-            {!state.valid ? (
+            {!valid ? (
               <div className="alert alert-danger">
-                Поля формы должны быть заполнены!
+                {Translations.errorEmptyAlert[language]}
               </div>
             ) : (
               ""
@@ -104,8 +104,7 @@ const mapStateToProps = state => ({
   loggedIn: state.app.loggedIn,
   fetching: state.auth.fetching,
   error: state.auth.error,
-  language: state.app.language,
-  labels: state.app.labels.login
+  language: state.app.language
 });
 
 const mapDispatchToProps = dispatch =>

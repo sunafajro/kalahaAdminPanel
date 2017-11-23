@@ -2,7 +2,7 @@ import React from "react";
 import { Route, Redirect, Switch, withRouter } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { bool, func } from "prop-types";
+import { bool, func, string } from "prop-types";
 
 import { getState } from "../../modules/actions/app";
 import Navigation from "../navigation";
@@ -10,12 +10,14 @@ import Game from "../game";
 import Auth from "../auth";
 import Categories from "../categories";
 import Words from "../words";
+import { Translations } from "../../translations/app";
 
 class App extends React.Component {
   static propTypes = {
     appLoaded: bool.isRequired,
     fetching: bool.isRequired,
     loggedIn: bool.isRequired,
+    language: string.isRequired,
     getState: func.isRequired
   };
 
@@ -24,37 +26,36 @@ class App extends React.Component {
   }
 
   render() {
-    let props = this.props;
+    let { appLoaded, fetching, language, location, loggedIn } = this.props;
     return (
       <div>
-        {!props.appLoaded ? (
-          <div className="alert alert-warning">Загружаем приложение...</div>
+        {!appLoaded ? (
+          <div className="alert alert-warning">{ Translations.appLoadingProccess[language] }</div>
         ) : (
           <div>
-            {!props.loggedIn &&
-            (props.location.pathname === "/backend/categories" ||
-              props.location.pathname === "/backend/words") ? (
-              <Redirect to="/backend/login" />
+            { !loggedIn &&
+              location.pathname !== "/login" ? (
+              <Redirect to="/login" />
             ) : (
               ""
             )}
-            {!props.fetching ? (
+            {!fetching ? (
               <div>
-                <Navigation location={this.props.location} />
+                <Navigation location={location} />
                 <Switch>
-                  <Route exact path="/backend/login" component={Auth} />
+                  <Route exact path="/login" component={Auth} />
                   <Route
                     exact
-                    path="/backend/categories"
+                    path="/categories"
                     component={Categories}
                   />
-                  <Route exact path="/backend/words" component={Words} />
+                  <Route exact path="/words" component={Words} />
                   <Route path="/" component={Game} />
                 </Switch>
               </div>
             ) : (
               <div className="alert alert-warning">
-                Загружаем данные приложения...
+                { Translations.appDataLoadingProccess[language] }
               </div>
             )}
           </div>
@@ -67,7 +68,8 @@ class App extends React.Component {
 const mapStateToProps = state => ({
   appLoaded: state.app.appLoaded,
   fetching: state.app.fetching,
-  loggedIn: state.app.loggedIn
+  loggedIn: state.app.loggedIn,
+  language: state.app.language
 });
 
 const mapDispatchToProps = dispatch =>

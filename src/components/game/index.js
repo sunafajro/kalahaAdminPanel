@@ -3,6 +3,7 @@ import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
 import { bool, func, object, string } from "prop-types";
 
+import { Translations } from "../../translations/game";
 import { getCategories } from "../../modules/actions/categories";
 import { getCategoryWords } from "../../modules/actions/words";
 import Quiz from "./quiz";
@@ -20,7 +21,6 @@ class Game extends React.Component {
     words: object.isRequired,
     error: object.isRequired,
     language: string.isRequired,
-    labels: object.isRequired,
     getCategories: func.isRequired,
     getCategoryWords: func.isRequired,
   };
@@ -46,42 +46,42 @@ class Game extends React.Component {
   }
 
   render() {
-    const state = this.state;
-    const props = this.props;
+    const { activeCategory } = this.state;
+    const { categories, error, fetchingCategories, fetchingWords, getCategoryWords, language, words } = this.props;
     return (
       <div>
-        {props.fetchingCategories ? (
-          <div className="alert alert-warning">Загружаем категории...</div>
+        {fetchingCategories ? (
+          <div className="alert alert-warning">{ Translations.categoriesLoadingProccess[language] }</div>
         ) : (
           <div className="row">
             <div className="col-sm-3">
-              {Object.keys(props.error).length ? (
-                <div className="alert alert-danger">{props.error.text}</div>
+              {Object.keys(error).length ? (
+                <div className="alert alert-danger">{error.text}</div>
               ) : (
                 ""
               )}
-              <h3>Категории:</h3>
-              {Object.keys(props.categories).length ? (
+              <h3>{ Translations.categoriesTitle[language] }</h3>
+              {Object.keys(categories).length ? (
                 <div className="list-group">
-                  {Object.keys(props.categories).map(item => {
+                  {Object.keys(categories).map(item => {
                     return (
                       <span
                         key={"category-" + item}
                         style={{ cursor: 'pointer' }}
                         className={
-                          state.activeCategory.name === item
+                          activeCategory.name === item
                             ? "list-group-item active"
                             : "list-group-item"
                         }
                         onClick={e => {
                           e.preventDefault();
-                          let activeCategory = props.categories[item];
+                          let activeCategory = categories[item];
                           activeCategory.name = item;
                           this.setState({ activeCategory });
-                          props.getCategoryWords(item);
+                          getCategoryWords(item);
                         }}
                       >
-                        {props.categories[item].title[props.language]}
+                        {categories[item].title[language]}
                       </span>
                     );
                   })}
@@ -93,12 +93,12 @@ class Game extends React.Component {
               )}
             </div>
             <div className="col-sm-9">
-              {props.fetchingWords ? (
+              {fetchingWords ? (
                 <div className="alert alert-warning">Загружаем слова...</div>
               ) : (
                 <div className="row align-items-center" style={{minHeight: '200px'}}>
-                  { Object.keys(props.words).length ?
-                    <Quiz activeCategory={state.activeCategory} /> : ""}
+                  { Object.keys(words).length ?
+                    <Quiz activeCategory={activeCategory} /> : ""}
                 </div>
               )}
               <Audio />
@@ -115,7 +115,6 @@ const mapStateToProps = state => ({
   fetchingWords: state.words.fetching,
   categories: state.categories.data,
   words: state.words.data,
-  labels: state.app.labels,
   language: state.app.language,
   error: state.categories.error
 });
