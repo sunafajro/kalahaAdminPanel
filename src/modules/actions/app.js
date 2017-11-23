@@ -2,7 +2,8 @@ import {
   GET_APPSTATE,
   GET_APPSTATE_SUCCESS,
   GET_APPSTATE_FAILED,
-  UPDATE_APPSTATE
+  UPDATE_APPSTATE,
+  CHANGE_APP_LANGUAGE
 } from "../constants";
 
 export const getState = category => {
@@ -63,3 +64,12 @@ export const updateAppState = newState => {
     });
   };
 };
+
+export const changeAppLanguage = language => {
+  return dispatch => {
+    dispatch({
+      type: CHANGE_APP_LANGUAGE,
+      language
+    });
+  };
+}

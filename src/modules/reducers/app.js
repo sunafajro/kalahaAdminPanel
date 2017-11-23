@@ -2,10 +2,9 @@ import {
   GET_APPSTATE,
   GET_APPSTATE_SUCCESS,
   GET_APPSTATE_FAILED,
-  UPDATE_APPSTATE
+  UPDATE_APPSTATE,
+  CHANGE_APP_LANGUAGE
 } from "../constants";
-
-import { LABELS } from '../constants/labels';
 
 const initialState = {
   fetching: false,
@@ -13,7 +12,6 @@ const initialState = {
   loggedIn: false,
   user: {},
   language: 'ru',
-  labels: LABELS,
   error: {}
 };
 
@@ -50,6 +48,12 @@ export default (state = initialState, action) => {
         ...state,
         loggedIn: action.loggedIn,
         user: action.user,
+        language: action.language
+      };
+
+    case CHANGE_APP_LANGUAGE:
+      return {
+        ...state,
         language: action.language
       };
 
