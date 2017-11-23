@@ -2,20 +2,40 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
+import { bool, func, object, string } from "prop-types";
+
+import { changeAppLanguage } from "../../modules/actions/app";
 import { logout } from "../../modules/actions/auth";
+import { Translations } from "../../translations/navigation";
+import MainMenu from "./MainMenu";
+import LoginLogout from "./LoginLogout";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 class Navigation extends React.Component {
-  handleLogout = e => {
-    e.preventDefault();
-    this.props.logout();
+  static propTypes = {
+    loggedIn: bool.isRequired,
+    user: object.isRequired,
+    language: string.isRequired,
+    location: object.isRequired,
+    changeAppLanguage: func.isRequired,
+    logout: func.isRequired
   };
+
   render() {
-    const props = this.props;
+    const {
+      changeAppLanguage,
+      language,
+      location,
+      loggedIn,
+      logout,
+      user
+    } = this.props;
+    const inactiveLanguage = language === "cv" ? "ru" : "cv";
     return (
       <nav className="navbar navbar-expand-lg navbar-light fixed-top bg-light">
         <div className="container">
-          <Link className="navbar-brand" to="/backend">
-            Кала-ха
+          <Link className="navbar-brand" to="/">
+            <img src="/files/images/site/logo.png" alt="Кала-ха" />
           </Link>
           <button
             className="navbar-toggler"
@@ -33,68 +53,24 @@ class Navigation extends React.Component {
             id="navbarSupportedContent"
           >
             <ul className="navbar-nav">
-              <li
-                className={
-                  props.location.pathname === "/backend/game"
-                    ? "nav-item active"
-                    : "nav-item"
-                }
-              >
-                <Link to={"/backend/game"} className="nav-link">
-                  {props.labels.gameLinkTitle[props.language]}
-                </Link>
-              </li>
-              {props.loggedIn ? (
-                <li
-                  className={
-                    props.location.pathname === "/backend/categories"
-                      ? "nav-item active"
-                      : "nav-item"
-                  }
-                >
-                  <Link to={"/backend/categories"} className="nav-link">
-                    {props.labels.categoriesLinkTitle[props.language]}
-                  </Link>
-                </li>
+              {loggedIn ? (
+                <MainMenu language={language} location={location} Translations={Translations} />
               ) : (
                 ""
               )}
-              {props.loggedIn ? (
-                <li
-                  className={
-                    props.location.pathname === "/backend/words"
-                      ? "nav-item active"
-                      : "nav-item"
-                  }
-                >
-                  <Link to={"/backend/words"} className="nav-link">
-                    {props.labels.wordsLinkTitle[props.language]}
-                  </Link>
-                </li>
-              ) : (
-                ""
-              )}
-              <li
-                className={
-                  props.location.pathname === "/backend/login"
-                    ? "nav-item active"
-                    : "nav-item"
-                }
-              >
-                {props.loggedIn ? (
-                  <a
-                    href="/backend/logout"
-                    className="nav-link"
-                    onClick={this.handleLogout}
-                  >
-                    {props.labels.logoutLinkTitle[props.language]} ({props.user.username})
-                  </a>
-                ) : (
-                  <Link to={"/backend/login"} className="nav-link">
-                    {props.labels.loginLinkTitle[props.language]}
-                  </Link>
-                )}
-              </li>
+              <LoginLogout
+                language={language}
+                loggedIn={loggedIn}
+                location={location}
+                Translations={Translations}
+                user={user}
+                logout={logout}
+              />
+              <LanguageSwitcher
+                inactiveLanguage={inactiveLanguage}
+                language={language}
+                changeAppLanguage={changeAppLanguage}
+              />
             </ul>
           </div>
         </div>
@@ -106,13 +82,13 @@ class Navigation extends React.Component {
 const mapStateToProps = state => ({
   loggedIn: state.app.loggedIn,
   user: state.app.user,
-  language: state.app.language,
-  labels: state.app.labels.navigation
+  language: state.app.language
 });
 
 const mapDispatchToProps = dispatch =>
   bindActionCreators(
     {
+      changeAppLanguage,
       logout
     },
     dispatch
