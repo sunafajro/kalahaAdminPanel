@@ -6,6 +6,7 @@ import { bool, func, object, string } from "prop-types";
 import { Translations } from "../../translations/game";
 import { getCategories } from "../../modules/actions/categories";
 import { getCategoryWords } from "../../modules/actions/words";
+import { jsUcfirst } from "../../utils";
 import Quiz from "./quiz";
 import Audio from "./audio";
 
@@ -81,7 +82,7 @@ class Game extends React.Component {
                           getCategoryWords(item);
                         }}
                       >
-                        {categories[item].title[language]}
+                        {jsUcfirst(categories[item].title[language])}
                       </span>
                     );
                   })}

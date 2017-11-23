@@ -1,6 +1,7 @@
 import React from "react";
 import { object } from "prop-types";
 
+import { jsUcfirst } from "../../utils";
 const baseUrl = "/files/images/flashcards";
 
 Card.propTypes = {
@@ -31,8 +32,16 @@ function Card({ word }) {
           ""
         )}
         <div className="card-body">
-          <h5 className="card-title">{word.cv}</h5>
-          <p>{word.ru}</p>
+        <img
+          style={{ width: "16px", height: "12px" }}
+          src={"/files/images/site/cv.png"}
+          alt="Чӑвашла"
+        /> {jsUcfirst(word.cv)}<br />
+          <img
+          style={{ width: "16px", height: "12px" }}
+          src={"/files/images/site/ru.png"}
+          alt="Русский"
+        /> {jsUcfirst(word.ru)}
         </div>
       </div>
     );
