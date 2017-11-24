@@ -1,10 +1,11 @@
 import React from "react";
+import { bool, func, object, string } from "prop-types";
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { bool, func, object, string } from "prop-types";
 
 import { getCategoryWords } from "../../modules/actions/words";
-import Card from "./card";
+import Card from "./ImageCard";
+import Sidebar from "./Sidebar";
 import { Translations } from "../../translations/words";
 
 class Words extends React.Component {
@@ -58,7 +59,11 @@ class Words extends React.Component {
           </div>
         ) : (
           <div className="row">
-            <div className="col-sm-3" />
+            <div className="col-sm-3">
+              <Sidebar
+                Translations={Translations}
+              />
+            </div>
             <div className="col-sm-9">
               { html ? html : ""}
             </div>
