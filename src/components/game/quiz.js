@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-import { object } from 'prop-types';
+import { func,  object } from 'prop-types';
 
 import {
   CLASSLIST,
@@ -22,7 +22,8 @@ class Quiz extends React.Component {
 
   static propTypes = {
     activeCategory: object.isRequired,
-    words: object.isRequired
+    words: object.isRequired,
+    pesponseHandle: func.isRequired
   };
 
   componentWillReceiveProps (nextProps) {
@@ -58,7 +59,8 @@ class Quiz extends React.Component {
       });
       if (!this.state.start) {
         this.setState({ start: true });
-      }     
+      }
+      this.props.pesponseHandle(null);
     }
   };
 
@@ -122,22 +124,20 @@ class Quiz extends React.Component {
   */
   checkAnswer = e => {
     if (this.state.active) {
-      const correctAnswer = document.querySelector("#teres");
-      const incorrectAnswer = document.querySelector("#teres_mar");
       const num = e.target.id.substr(-1, 1);
       let totalCount = this.state.totalCount;
       let classList = { ...this.state.classList };
       if (this.state.responses[num].cv === this.state.word.cv) {
         totalCount++;
         classList[num] = CLASSLIST_CORRECT;
-        correctAnswer.play();
+        this.props.pesponseHandle(true);
       } else {
         if (totalCount > 0) {
           totalCount--;
         }
         classList[num] = CLASSLIST_INCORRECT;
         classList[this.state.correctId] = CLASSLIST_CORRECT;
-        incorrectAnswer.play();
+        this.props.pesponseHandle(false);
       }
       this.setState({
         totalCount,

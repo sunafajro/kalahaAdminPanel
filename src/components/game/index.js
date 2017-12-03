@@ -12,7 +12,8 @@ import Audio from "./audio";
 
 class Game extends React.Component {
   state = {
-    activeCategory: {}
+    activeCategory: {},
+    isCorrect: null
   }
 
   static propTypes = {
@@ -46,8 +47,12 @@ class Game extends React.Component {
     }
   }
 
+  pesponseHandle = (value) => {
+    this.setState({ isCorrect: value });
+  }
+
   render() {
-    const { activeCategory } = this.state;
+    const { activeCategory, isCorrect } = this.state;
     const { categories, error, fetchingCategories, fetchingWords, getCategoryWords, language, words } = this.props;
     return (
       <div>
@@ -99,10 +104,10 @@ class Game extends React.Component {
               ) : (
                 <div className="row align-items-center" style={{minHeight: '200px'}}>
                   { Object.keys(words).length ?
-                    <Quiz activeCategory={activeCategory} /> : ""}
+                    <Quiz activeCategory={activeCategory} pesponseHandle={this.pesponseHandle} /> : ""}
                 </div>
               )}
-              <Audio />
+              <Audio isCorrect={isCorrect} />
             </div>
           </div>
         )}
